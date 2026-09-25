@@ -1,0 +1,31 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/ai/">
+    <Project Path="src/ai/FinAI.AI.Abstractions/FinAI.AI.Abstractions.csproj" />
+    <Project Path="src/ai/FinAI.AI.Agents/FinAI.AI.Agents.csproj" />
+    <Project Path="src/ai/FinAI.AI.Rag/FinAI.AI.Rag.csproj" />
+  </Folder>
+  <Folder Name="/src/bootstrap/">
+    <Project Path="src/bootstrap/FinAI.Api/FinAI.Api.csproj" />
+    <Project Path="src/bootstrap/FinAI.Workers/FinAI.Workers.csproj" />
+  </Folder>
+  <Folder Name="/src/building-blocks/">
+    <Project Path="src/building-blocks/FinAI.BuildingBlocks.Application/FinAI.BuildingBlocks.Application.csproj" />
+    <Project Path="src/building-blocks/FinAI.BuildingBlocks.Domain/FinAI.BuildingBlocks.Domain.csproj" />
+    <Project Path="src/building-blocks/FinAI.BuildingBlocks.Infrastructure/FinAI.BuildingBlocks.Infrastructure.csproj" />
+    <Project Path="src/building-blocks/FinAI.IntegrationEvents/FinAI.IntegrationEvents.csproj" />
+  </Folder>
+  <Folder Name="/src/modules/">
+    <Project Path="src/modules/FinAI.Modules.Account/FinAI.Modules.Account.csproj" />
+    <Project Path="src/modules/FinAI.Modules.Customer/FinAI.Modules.Customer.csproj" />
+    <Project Path="src/modules/FinAI.Modules.Fraud/FinAI.Modules.Fraud.csproj" />
+    <Project Path="src/modules/FinAI.Modules.Identity/FinAI.Modules.Identity.csproj" />
+    <Project Path="src/modules/FinAI.Modules.Notification/FinAI.Modules.Notification.csproj" />
+    <Project Path="src/modules/FinAI.Modules.Payment/FinAI.Modules.Payment.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FinAI.ArchitectureTests/FinAI.ArchitectureTests.csproj" />
+    <Project Path="tests/FinAI.IntegrationTests/FinAI.IntegrationTests.csproj" />
+    <Project Path="tests/FinAI.UnitTests/FinAI.UnitTests.csproj" />
+  </Folder>
+</Solution>
