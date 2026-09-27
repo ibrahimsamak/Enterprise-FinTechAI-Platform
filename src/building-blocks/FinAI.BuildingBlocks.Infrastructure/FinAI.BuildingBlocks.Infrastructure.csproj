@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\FinAI.BuildingBlocks.Application\FinAI.BuildingBlocks.Application.csproj" />
+    <ProjectReference Include="..\FinAI.BuildingBlocks.Domain\FinAI.BuildingBlocks.Domain.csproj" />
+    <ProjectReference Include="..\FinAI.IntegrationEvents\FinAI.IntegrationEvents.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Confluent.Kafka" />
+    <PackageReference Include="OpenTelemetry.Api" />
+    <PackageReference Include="Hangfire.AspNetCore" />
+    <PackageReference Include="Hangfire.PostgreSql" />
+    <PackageReference Include="Newtonsoft.Json" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>
