@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-FinAI.Workers-85d0c8c7-4ec2-4166-8d9d-928a23e99b3c</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Serilog.Sinks.Seq" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" />
+    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" />
+    <PackageReference Include="Npgsql.OpenTelemetry" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="Pgvector.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\building-blocks\FinAI.BuildingBlocks.Application\FinAI.BuildingBlocks.Application.csproj" />
+    <ProjectReference Include="..\..\building-blocks\FinAI.BuildingBlocks.Domain\FinAI.BuildingBlocks.Domain.csproj" />
+    <ProjectReference Include="..\..\building-blocks\FinAI.BuildingBlocks.Infrastructure\FinAI.BuildingBlocks.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\building-blocks\FinAI.IntegrationEvents\FinAI.IntegrationEvents.csproj" />
+    <ProjectReference Include="..\..\ai\FinAI.AI.Abstractions\FinAI.AI.Abstractions.csproj" />
+    <ProjectReference Include="..\..\ai\FinAI.AI.Rag\FinAI.AI.Rag.csproj" />
+    <ProjectReference Include="..\..\ai\FinAI.AI.Agents\FinAI.AI.Agents.csproj" />
+    <ProjectReference Include="..\..\modules\FinAI.Modules.Fraud\FinAI.Modules.Fraud.csproj" />
+    <ProjectReference Include="..\..\modules\FinAI.Modules.Account\FinAI.Modules.Account.csproj" />
+    <ProjectReference Include="..\..\modules\FinAI.Modules.Payment\FinAI.Modules.Payment.csproj" />
+  </ItemGroup>
+</Project>
