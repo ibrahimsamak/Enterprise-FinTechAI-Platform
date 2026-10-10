@@ -1,0 +1,7 @@
+{
+  "/dev/token":   { "target": "http://localhost:5286", "secure": false },
+  "/payments":    { "target": "http://localhost:5286", "secure": false },
+  "/fraud-cases": { "target": "http://localhost:5286", "secure": false },
+  "/graphql":     { "target": "http://localhost:5286", "secure": false },
+  "/hubs":        { "target": "http://localhost:5286", "secure": false, "ws": true }
+}
