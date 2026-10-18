@@ -1,3 +1,4 @@
+using FinAI.BuildingBlocks.Application;
 using FinAI.Modules.Customer.Application;
 using FinAI.Modules.Customer.Infrastructure;
 using MediatR;
@@ -7,13 +8,17 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 
 namespace FinAI.Modules.Customer;
 
 public sealed class CustomerModule : IModule
 {
-    public void Register(IServiceCollection s, IConfiguration cfg) =>
-        s.AddDbContext<CustomerDbContext>(o => o.UseNpgsql(cfg.GetConnectionString("Postgres")));
+    public void Register(IServiceCollection s, IConfiguration cfg)
+    {
+        s.AddDbContext<CustomerDbContext>((sp, o) => o.UseNpgsql(sp.GetRequiredService<NpgsqlDataSource>()));
+        s.AddScoped<ICustomerLookup, CustomerLookup>();
+    }
 
     public void MapEndpoints(IEndpointRouteBuilder app)
     {

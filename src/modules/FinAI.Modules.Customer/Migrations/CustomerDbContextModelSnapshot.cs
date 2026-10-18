@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using FinAI.Modules.Customer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -36,7 +37,13 @@ namespace FinAI.Modules.Customer.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("Customers", "customer");
                 });

@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using FinAI.Modules.Customer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
