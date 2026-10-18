@@ -3,6 +3,7 @@ using FinAI.AI.Abstractions.Tools;
 using FinAI.AI.Agents;
 using FinAI.AI.Rag.Ingestion;
 using FinAI.BuildingBlocks.Application;
+using FinAI.BuildingBlocks.Infrastructure.Data;
 using FinAI.BuildingBlocks.Infrastructure.Jobs;
 using FinAI.BuildingBlocks.Infrastructure.Messaging;
 using FinAI.Modules.Account.Application;
@@ -11,6 +12,7 @@ using FinAI.Modules.Fraud;
 using FinAI.Modules.Fraud.Infrastructure;
 using FinAI.Modules.Payment.Infrastructure;
 using FinAI.Workers.Jobs;
+using FinAI.ServiceDefaults;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
@@ -22,29 +24,16 @@ var ingest = args is ["ingest-knowledge", ..];
 
 var builder = Host.CreateApplicationBuilder(args);
 
-builder.Services.AddSerilog((_, lc) => lc
-    .ReadFrom.Configuration(builder.Configuration)
-    .WriteTo.Console()
-    .WriteTo.Seq("http://localhost:5341"));
+builder.AddFinAiDefaults("FinAI.Workers", isWeb: false);
 
-builder.Services.AddOpenTelemetry()
-    .ConfigureResource(r => r.AddService("FinAI.Workers"))
-    .WithTracing(t => t
-        .AddHttpClientInstrumentation()
-        .AddEntityFrameworkCoreInstrumentation()
-        .AddNpgsql()
-        .AddSource("FinAI.*")
-        .AddOtlpExporter(o => o.Endpoint = new Uri(builder.Configuration["OTEL:ENDPOINT"]!)))
-    .WithMetrics(m => m
-        .AddMeter("FinAI.*")
-        .AddOtlpExporter(o => o.Endpoint = new Uri(builder.Configuration["OTEL:ENDPOINT"]!)));
+builder.Services.AddFinAiPostgres(builder.Configuration, AzureCredentials.Default);
 
 builder.Services.AddScoped<ICurrentUser, SystemCurrentUser>();
-builder.Services.AddDbContext<AccountDbContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
+builder.Services.AddDbContext<AccountDbContext>((sp, o) => o.UseNpgsql(sp.GetRequiredService<NpgsqlDataSource>()));
 builder.Services.AddScoped<IAccountQueries, AccountQueries>();
 
 builder.Services.AddScoped<FraudRulesEngine>();
-builder.Services.AddDbContext<FraudDbContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
+builder.Services.AddDbContext<FraudDbContext>((sp, o) => o.UseNpgsql(sp.GetRequiredService<NpgsqlDataSource>()));
 builder.Services.AddFinAiAiPlatform(builder.Configuration);
 
 builder.Services.AddSingleton<IEventPublisher, KafkaEventPublisher>();
@@ -59,7 +48,7 @@ if (!ingest)
     builder.Services.AddHostedService<KafkaConsumerBackgroundService<PaymentCreatedIntegrationEvent, PaymentCreatedTransactionProjection>>();
 
     builder.Services.AddFinAiHangfire(builder.Configuration, runServer: true);
-    builder.Services.AddDbContext<PaymentDbContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
+    builder.Services.AddDbContext<PaymentDbContext>((sp, o) => o.UseNpgsql(sp.GetRequiredService<NpgsqlDataSource>()));
 }
 
 var host = builder.Build();

@@ -10,7 +10,7 @@ using OpenTelemetry.Context.Propagation;
 
 namespace FinAI.BuildingBlocks.Infrastructure.Messaging;
 
-public sealed class KafkaConsumerBackgroundService<T, THandler>(IConfiguration cfg, IServiceScopeFactory scopes, ILogger<KafkaConsumerBackgroundService<T, THandler>> log): BackgroundService
+public sealed class KafkaConsumerBackgroundService<T, THandler>(IConfiguration cfg, IServiceScopeFactory scopes, ILogger<KafkaConsumerBackgroundService<T, THandler>> log) : BackgroundService
     where T : IntegrationEvent
     where THandler : IIntegrationEventHandler<T>
 {
@@ -24,21 +24,9 @@ public sealed class KafkaConsumerBackgroundService<T, THandler>(IConfiguration c
     {
         var topic = TopicResolver.For<T>();
         var groupId = $"{topic}.{typeof(THandler).Name}";
-        var bootstrap = cfg["Kafka:BootstrapServers"];
 
-        using var consumer = new ConsumerBuilder<string, byte[]>(new ConsumerConfig
-        {
-            BootstrapServers = bootstrap,
-            GroupId = groupId,
-            AutoOffsetReset = AutoOffsetReset.Earliest,
-            EnableAutoCommit = false
-        }).Build();
-        using var deadLetters = new ProducerBuilder<string, byte[]>(new ProducerConfig
-        {
-            BootstrapServers = bootstrap,
-            Acks = Acks.All,
-            EnableIdempotence = true
-        }).Build();
+        using var consumer = KafkaClients.Consumer(cfg, groupId);
+        using var deadLetters = KafkaClients.Producer(cfg);
 
         consumer.Subscribe(topic);
 

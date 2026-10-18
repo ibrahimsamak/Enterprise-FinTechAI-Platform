@@ -8,9 +8,12 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Microsoft.Azure.SignalR" />
+    <PackageReference Include="Microsoft.Azure.StackExchangeRedis" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" />
     <PackageReference Include="MediatR" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" />
     <PackageReference Include="Serilog.AspNetCore" />
     <PackageReference Include="Serilog.Sinks.Seq" />
     <PackageReference Include="OpenTelemetry.Extensions.Hosting" />
@@ -38,6 +41,7 @@
     <ProjectReference Include="..\..\modules\FinAI.Modules.Payment\FinAI.Modules.Payment.csproj" />
     <ProjectReference Include="..\..\modules\FinAI.Modules.Fraud\FinAI.Modules.Fraud.csproj" />
     <ProjectReference Include="..\..\modules\FinAI.Modules.Notification\FinAI.Modules.Notification.csproj" />
+    <ProjectReference Include="..\FinAI.ServiceDefaults\FinAI.ServiceDefaults.csproj" />
   </ItemGroup>
 
 </Project>

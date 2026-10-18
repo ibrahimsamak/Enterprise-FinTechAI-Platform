@@ -7,13 +7,14 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 
 namespace FinAI.Modules.Fraud;
 
 public sealed class FraudModule : IModule
 {
     public void Register(IServiceCollection s, IConfiguration cfg) =>
-        s.AddDbContext<FraudDbContext>(o => o.UseNpgsql(cfg.GetConnectionString("Postgres")));
+        s.AddDbContext<FraudDbContext>((sp, o) => o.UseNpgsql(sp.GetRequiredService<NpgsqlDataSource>()));
 
     public void MapEndpoints(IEndpointRouteBuilder app)
     {

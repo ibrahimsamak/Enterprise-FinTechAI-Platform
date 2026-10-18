@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using FinAI.Modules.Payment.Infrastructure;
 using Microsoft.EntityFrameworkCore;

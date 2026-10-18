@@ -7,13 +7,14 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 
 namespace FinAI.Modules.Payment;
 
 public sealed class PaymentModule : IModule
 {
     public void Register(IServiceCollection s, IConfiguration cfg) =>
-        s.AddDbContext<PaymentDbContext>(o => o.UseNpgsql(cfg.GetConnectionString("Postgres")));
+        s.AddDbContext<PaymentDbContext>((sp, o) => o.UseNpgsql(sp.GetRequiredService<NpgsqlDataSource>()));
 
     public void MapEndpoints(IEndpointRouteBuilder app)
     {

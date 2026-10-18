@@ -7,6 +7,7 @@
   </Folder>
   <Folder Name="/src/bootstrap/">
     <Project Path="src/bootstrap/FinAI.Api/FinAI.Api.csproj" />
+    <Project Path="src/bootstrap/FinAI.ServiceDefaults/FinAI.ServiceDefaults.csproj" />
     <Project Path="src/bootstrap/FinAI.Workers/FinAI.Workers.csproj" />
   </Folder>
   <Folder Name="/src/building-blocks/">
@@ -22,6 +23,9 @@
     <Project Path="src/modules/FinAI.Modules.Identity/FinAI.Modules.Identity.csproj" />
     <Project Path="src/modules/FinAI.Modules.Notification/FinAI.Modules.Notification.csproj" />
     <Project Path="src/modules/FinAI.Modules.Payment/FinAI.Modules.Payment.csproj" />
+  </Folder>
+  <Folder Name="/src/tools/">
+    <Project Path="src/tools/FinAI.Migrator/FinAI.Migrator.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/FinAI.ArchitectureTests/FinAI.ArchitectureTests.csproj" />

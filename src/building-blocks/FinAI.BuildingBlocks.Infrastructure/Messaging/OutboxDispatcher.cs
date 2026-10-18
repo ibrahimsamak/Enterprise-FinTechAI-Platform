@@ -37,8 +37,21 @@ public sealed class OutboxDispatcher<TDbContext>(
     {
         using var scope = scopes.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<TDbContext>();
-        var batch = await db.Outbox.Where(o => o.ProcessedOnUtc == null)
-                                   .OrderBy(o => o.OccurredOnUtc).Take(BatchSize).ToListAsync(ct);
+
+        var entity = db.Model.FindEntityType(typeof(OutboxMessage))!;
+        var table = $"\"{entity.GetSchema()}\".\"{entity.GetTableName()}\"";
+        await using var tx = await db.Database.BeginTransactionAsync(ct);
+#pragma warning disable EF1002
+        var batch = await db.Outbox.FromSqlRaw($"""
+            SELECT * FROM {table}
+            WHERE "ProcessedOnUtc" IS NULL
+            ORDER BY "OccurredOnUtc"
+            LIMIT {BatchSize}
+            FOR UPDATE SKIP LOCKED
+            """)
+        .ToListAsync(ct);
+#pragma warning restore EF1002
+
         if (batch.Count == 0) return;
 
         try
@@ -56,6 +69,7 @@ public sealed class OutboxDispatcher<TDbContext>(
         finally
         {
             await db.SaveChangesAsync(CancellationToken.None);
+            await tx.CommitAsync(CancellationToken.None);
         }
     }
 }

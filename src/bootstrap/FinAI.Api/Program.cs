@@ -18,33 +18,37 @@ using FinAI.Modules.Notification;
 using FluentValidation;
 using FinAI.BuildingBlocks.Infrastructure.Jobs;
 using Hangfire;
+using Hangfire.Dashboard;
+using Microsoft.Identity.Web;
 using FinAI.Api.Dashboard;
 using FinAI.AI.Agents;
+using FinAI.ServiceDefaults;
+using FinAI.BuildingBlocks.Infrastructure.Data;
+using Microsoft.Azure.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Host.UseSerilog((ctx, lc) => lc
-    .ReadFrom.Configuration(ctx.Configuration)
-    .WriteTo.Console()
-    .WriteTo.Seq("http://localhost:5341"));
+builder.AddFinAiDefaults("FinAI.Api", isWeb: true);
 
-builder.Services.AddOpenTelemetry()
-    .ConfigureResource(r => r.AddService("FinAI.Api"))
-    .WithTracing(t => t
-        .AddAspNetCoreInstrumentation()
-        .AddHttpClientInstrumentation()
-        .AddEntityFrameworkCoreInstrumentation()
-        .AddNpgsql()
-        .AddSource("FinAI.*")
-        .AddOtlpExporter(o => o.Endpoint = new Uri(builder.Configuration["OTEL:ENDPOINT"]!)))
-    .WithMetrics(m => m
-        .AddAspNetCoreInstrumentation()
-        .AddRuntimeInstrumentation()
-        .AddOtlpExporter(o => o.Endpoint = new Uri(builder.Configuration["OTEL:ENDPOINT"]!)));
+builder.Services.AddFinAiPostgres(builder.Configuration, AzureCredentials.Default);
+
+builder.Services.AddHealthChecks().AddDbContextCheck<PaymentDbContext>("postgres", tags: ["ready"]);
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
 builder.Services.AddFinAIAuth(builder.Configuration);
+
+if (builder.Configuration.GetSection("AzureAd").Exists())
+{
+    builder.Services.AddAuthentication()
+        .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"),
+            openIdConnectScheme: "HangfireOidc", cookieScheme: "HangfireCookie");
+
+    builder.Services.AddAuthorizationBuilder()
+        .AddPolicy("HangfireAdmin", p => p
+            .AddAuthenticationSchemes("HangfireOidc")
+            .RequireRole("Admin"));
+}
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
     ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Redis")!));
@@ -52,7 +56,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
 builder.Services.AddMediatR(c => c.RegisterServicesFromAssemblies(ModuleRegistry.Assemblies));
 builder.Services.AddValidatorsFromAssemblies(ModuleRegistry.Assemblies);
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(IdempotencyBehavior<,>));  
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(IdempotencyBehavior<,>));
 
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ApiExceptionHandler>();
@@ -63,7 +67,10 @@ builder.Services.AddHostedService<OutboxDispatcher<PaymentDbContext>>();
 var modules = ModuleRegistry.LoadModules();
 foreach (var m in modules) m.Register(builder.Services, builder.Configuration);
 
-builder.Services.AddSignalR();
+var signalR = builder.Services.AddSignalR();
+if (builder.Configuration["AZURE:SIGNALR:ENDPOINT"] is { Length: > 0 } endpoint)
+    signalR.AddAzureSignalR(o => o.Endpoints = [new ServiceEndpoint(new Uri(endpoint), AzureCredentials.Default)]);
+
 builder.Services.AddScoped<FraudFlaggedRelayHandler>();
 builder.Services.AddHostedService<KafkaConsumerBackgroundService<FraudFlaggedIntegrationEvent, FraudFlaggedRelayHandler>>();
 
@@ -95,8 +102,15 @@ foreach (var m in modules) m.MapEndpoints(app);
 app.MapHub<FraudHub>("/hubs/fraud");
 app.MapHub<SupportHub>("/hubs/support");
 
-app.MapHangfireDashboard("/hangfire");
+if (app.Configuration.GetSection("AzureAd").Exists())
+    app.MapHangfireDashboard("/hangfire", new DashboardOptions { Authorization = [] })
+       .RequireAuthorization("HangfireAdmin");
+else
+    app.MapHangfireDashboard("/hangfire");
 app.MapGraphQL().RequireAuthorization("FraudOfficer");
+
+app.MapHealthChecks("/health/live", new() { Predicate = _ => false });
+app.MapHealthChecks("/health/ready", new() { Predicate = c => c.Tags.Contains("ready") });
 
 if (app.Environment.IsDevelopment())
 {

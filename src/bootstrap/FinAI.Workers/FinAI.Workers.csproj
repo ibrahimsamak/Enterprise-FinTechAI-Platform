@@ -32,5 +32,6 @@
     <ProjectReference Include="..\..\modules\FinAI.Modules.Fraud\FinAI.Modules.Fraud.csproj" />
     <ProjectReference Include="..\..\modules\FinAI.Modules.Account\FinAI.Modules.Account.csproj" />
     <ProjectReference Include="..\..\modules\FinAI.Modules.Payment\FinAI.Modules.Payment.csproj" />
+    <ProjectReference Include="..\FinAI.ServiceDefaults\FinAI.ServiceDefaults.csproj" />
   </ItemGroup>
 </Project>

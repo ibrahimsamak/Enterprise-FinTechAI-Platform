@@ -15,13 +15,7 @@ public sealed class KafkaEventPublisher : IEventPublisher, IDisposable
     private readonly IProducer<string, byte[]> _producer;
 
     public KafkaEventPublisher(IConfiguration cfg) =>
-        _producer = new ProducerBuilder<string, byte[]>(new ProducerConfig
-        {
-            BootstrapServers = cfg["Kafka:BootstrapServers"]
-                ?? throw new InvalidOperationException("Kafka:BootstrapServers is not configured."),
-            Acks = Acks.All,
-            EnableIdempotence = true
-        }).Build();
+        _producer = KafkaClients.Producer(cfg);
 
     public async Task PublishAsync<T>(T @event, CancellationToken ct = default) where T : IntegrationEvent
     {

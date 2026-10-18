@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using FinAI.Modules.Account.Infrastructure;
 using Microsoft.EntityFrameworkCore;
