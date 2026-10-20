@@ -1,0 +1,5 @@
+prefix              = "finai"
+location            = "westeurope"
+image_tag           = "latest"
+entra_api_client_id = "00000000-0000-0000-0000-000000000000"
+github_repo         = "bobsamak/DotNetMVP"

@@ -27,6 +27,11 @@ coverage/
 *.env.local
 appsettings.*.local.json
 
+**/.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+
 .codeboarding/
 
 .DS_Store
