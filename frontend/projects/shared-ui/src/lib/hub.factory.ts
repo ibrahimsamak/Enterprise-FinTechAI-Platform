@@ -8,7 +8,7 @@ export class HubFactory {
 
   create(path: string): HubConnection {
     return new HubConnectionBuilder()
-      .withUrl(path, { accessTokenFactory: () => this.auth.token ?? '' })
+      .withUrl(path, { accessTokenFactory: () => this.auth.getAccessToken().then(t => t ?? '') })
       .withAutomaticReconnect()
       .configureLogging(LogLevel.Warning)
       .build();
