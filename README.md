@@ -121,3 +121,24 @@ Modules don't reference each other and the AI projects don't reference any modul
 dotnet test FinAI.slnx
 cd frontend && npx ng test customer-portal --watch=false
 ```
+
+## Azure
+
+This branch can also run on Azure. Locally nothing changes; the Azure parts only turn on when their settings are present.
+
+- Kafka is replaced by Event Hubs (Kafka endpoint, OAuth with managed identity)
+- Postgres Flexible Server with Entra auth instead of a password
+- Azure SignalR Service, Azure Cache for Redis, Key Vault
+- Entra ID sign-in for both portals (MSAL) instead of the dev token endpoint
+- traces/metrics/logs to Application Insights, with a few alerts (dead letters, error rate, agent latency, SLA breaches)
+- API, workers and a migrator job on Container Apps, portals on Static Web Apps behind Front Door
+
+Infra is in `deploy/terraform`. Copy `terraform.tfvars.example` to `terraform.tfvars`, fill it in, then:
+
+```bash
+cd deploy/terraform
+terraform init
+terraform apply
+```
+
+The images are built from `deploy/docker/Dockerfile` (same file for api, workers and migrator, pick the project with `--build-arg PROJECT=... --build-arg DLL=...`) and pushed to the ACR that terraform creates. On the first apply the images don't exist yet, so push them first or point the apps at a placeholder image. `FinAI.Migrator` runs the EF migrations for all modules and is started as a Container Apps job.
